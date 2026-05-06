@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Widevine Downloader",
+  "version": "1.0",
+  "description": "Download encrypted content",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "WidevineDownloader@WidevineDownloader"
+    }
+  },
+  "permissions": [
+    "downloads",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "*://*/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_title": "Widevine Downloader",
+    "default_popup": "popup.html"
+  }
+}
