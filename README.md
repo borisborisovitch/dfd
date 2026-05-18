@@ -29,7 +29,7 @@ The attack can be performed on Linux (verified on Ubuntu 24.04.3) and Windows (v
   * [Firefox](https://www.mozilla.org/firefox/) and [VLC](https://images.videolan.org/vlc/)
 
 **On Windows.**
-  * [Visual Studio](https://visualstudio.microsoft.com/) with the *Desktop development with C++* kit.
+  * [Visual Studio 2026](https://visualstudio.microsoft.com/) with the *Desktop development with C++* kit and MSVC v145.
   * [Firefox](https://www.mozilla.org/firefox/).
 
 
@@ -44,7 +44,7 @@ As described in the paper, we implemented two versions of the attack depending o
   * Compile the attack executable by running `cmake . -B build \&\& make -C build/` in `Processor/`.
 
 **On Windows.**
-  * Download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/). When asked which additional components to install, select *Desktop development with C++* and continue.
+  * Download and install [Visual Studio 2026](https://visualstudio.microsoft.com/downloads/). When asked which additional components to install, select *Desktop development with C++* with MSVC v145 and continue.
   * Download and install the latest version of [Firefox](https://www.firefox.com/en-US/download/windows/).
   * Double click on `Processor/DefectiveByDesign.sln` to open the solution in Visual Studio then build it with *Build > Build Solution*.
 
