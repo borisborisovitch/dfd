@@ -69,7 +69,7 @@ This artifact enables the reproduction described in our paper. When visiting a w
           # On Windows
           ./RUN.ps1
           ```
-          On both systems, once Firefox has opened, proceed as follows. In the first tab, click *Load Temporary Add-on...* and select any file from `Web-Extension/` to load the extension. In the second tab, start video playback using the play button, then open the *Widevine Downloader* extension. The protected tracks should appear in the extension's pop-up. Select the ones you want to download and decrypt.
+          On both systems, once Firefox has opened, proceed as follows. In the first tab, click *Load Temporary Add-on...* and select any file from `Web-Extension/` to load the extension. In the second tab, start video playback using the blue play button on top of the player, then open the *Widevine Downloader* extension. The protected tracks should appear in the extension's pop-up. Select the ones you want to download and decrypt.
 
       * **Results:** Once the track is downloaded, the video should stop playing, indicating that Widevine is busy decrypting the downloaded file. Depending on the track resolution and the encoder preset, the process may take a few minutes to complete. The resulting decrypted files are typically stored in `~/Downloads/WidevineMedia`.
       
