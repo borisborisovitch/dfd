@@ -1,0 +1,10 @@
+.git
+output
+*.log
+Processor/build
+Processor/FFmpeg
+Processor/injector
+Processor/hook/*.vcxproj*
+Processor/hook/src/dllmain.cpp
+__pycache__
+*.pyc

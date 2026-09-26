@@ -17,6 +17,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "muxer.h"
 
+#include <cstring>
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
@@ -34,7 +36,11 @@ bool init_aac_muxer(const char* filename, int sample_rate, int frame_size,
                     int nb_channels, const uint8_t* aac_extradata,
                     int aac_extradata_size) {
   mux = MuxState();
-  if (avformat_alloc_output_context2(&mux.fmt, nullptr, nullptr, filename) < 0)
+  const char* extension = std::strrchr(filename, '.');
+  const char* format = extension && std::strcmp(extension, ".aac") == 0
+                           ? "adts"
+                           : nullptr;
+  if (avformat_alloc_output_context2(&mux.fmt, nullptr, format, filename) < 0)
     return false;
 
   mux.astream = avformat_new_stream(mux.fmt, nullptr);

@@ -1,0 +1,25 @@
+{
+  "policies": {
+    "Preferences": {
+      "xpinstall.signatures.required": {
+        "Value": false,
+        "Status": "locked"
+      },
+      "media.eme.enabled": {
+        "Value": true,
+        "Status": "locked"
+      },
+      "media.gmp-widevinecdm.enabled": {
+        "Value": true,
+        "Status": "locked"
+      }
+    },
+    "ExtensionSettings": {
+      "WidevineDownloader@WidevineDownloader": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///opt/widevine-downloader.xpi",
+        "default_area": "navbar"
+      }
+    }
+  }
+}

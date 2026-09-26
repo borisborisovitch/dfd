@@ -1,0 +1,20 @@
+services:
+  reproduction:
+    build:
+      context: .
+      args:
+        REENCODE: ${REENCODE:-OFF}
+    platform: linux/amd64
+    init: true
+    shm_size: 2gb
+    environment:
+      TARGET_URL: ${TARGET_URL:?Pass --url to dfd.sh}
+      PARALLELISM: ${PARALLELISM:-4}
+      OUTPUT_FORMAT: ${OUTPUT_FORMAT:-mp3}
+    volumes:
+      - firefox-profile:/home/researcher/profile
+      - ${MEDIA_OUTPUT_PATH:-./output}:/home/researcher/Downloads/WidevineMedia
+      - ${LOG_OUTPUT_PATH:-./output/.widevine-logs}:/home/researcher/logs
+
+volumes:
+  firefox-profile:

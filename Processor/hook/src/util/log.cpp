@@ -39,13 +39,13 @@ void init_log() {
 
   LOG_STREAM = fopen(LOG_FILE, "ab");
 
-  if (setvbuf(LOG_STREAM, NULL, _IONBF, 0) == -1) {
-    perror("");
+  if (LOG_STREAM == NULL) {
+    perror("Unable to open processor log");
     exit(-1);
   }
 
-  if (LOG_STREAM == NULL) {
-    perror("");
+  if (setvbuf(LOG_STREAM, NULL, _IONBF, 0) == -1) {
+    perror("Unable to configure processor log");
     exit(-1);
   }
   free(LOG_FILE);
@@ -66,10 +66,15 @@ void log_time(FILE* stream) {
 void log(const char* fmt, ...) {
   va_list arg;
   va_start(arg, fmt);
+  va_list console_arg;
+  va_copy(console_arg, arg);
 
   if (!LOG_STREAM) init_log();
 
   log_time(LOG_STREAM);
   vfprintf(LOG_STREAM, fmt, arg);
+  log_time(stderr);
+  vfprintf(stderr, fmt, console_arg);
+  va_end(console_arg);
   va_end(arg);
 }

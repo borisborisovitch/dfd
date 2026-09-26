@@ -1,80 +1,50 @@
+# dfd: 'Defective by Design' Widevine toolkit
 
-# Defective by Design: Universal Recovery of All Widevine-Protected Content on Desktop Environments
+This repository applies the [Defective by Design research and code](https://github.com/froud0t/DefectiveByDesign) to Udio's public song player. [Original paper.](https://www.usenix.org/system/files/woot26-roudot.pdf)
 
-## Abstract
+This implementation uses Docker to help fellow cybersecurity researchers reproduce their interception technique on Udio songs.
 
-Nowadays, streaming services, such as *Netflix*, rely on Digital Rights Management (DRM) systems to deliver their protected content. These systems aim to prevent piracy. Specifically, non-subscribers are prevented from accessing the content altogether, while subscribers are prevented from acquiring decrypted copies of the media to avoid uncontrolled distribution. Among the currently deployed DRM systems, Google Widevine is the most widely used, especially on desktops, where it provides a fully software-based solution.
+## Setup
 
-In this paper, we investigate Widevine's decryption interface and its integration in modern web browsers. We show that Widevine's boundary (*i.e.,* its output after media decryption) is inherently unprotected and can be intercepted with relative ease. Under an attacker merely observing this interface, we show that audio content can be trivially recovered because the decrypted samples are returned prior to decoding. We further identify that, under a commonly used Widevine configuration, the same "decrypt only" behavior also applies to video, enabling direct recovery of video frames. When this misconfiguration is absent, we show that Widevine still outputs decrypted and decoded frames that can be efficiently re-encoded with negligible quality degradation.
+1. Install Docker:
 
-Based on our findings, we build an attack that "downloads" any content protected by Widevine into a playable format on both Linux and Windows. Finally, we assess the effectiveness of our attack by applying it to premium streaming platforms.
+   - macOS: Install [Docker Desktop](https://docs.docker.com/desktop/).
+   - Linux: Install [Docker Engine with Compose](https://docs.docker.com/compose/install/linux/).
+   - Windows: Install [Docker Desktop](https://docs.docker.com/desktop/) and enable [WSL2 integration](https://docs.docker.com/desktop/features/wsl/), then run the commands from a WSL2 shell.
 
-## Description & Requirements
+2. Clone this repository:
 
-### Security, privacy, and ethical concerns
+   ```bash
+   git clone https://github.com/borisborisovitch/dfd
+   ```
 
-Executing the attack does not present any security risks to the user's device. The exploited vulnerability has been responsibly disclosed to Widevine, which did not consider it severe enough to warrant a patch. The protected content used for the attack is publicly accessible on [Widevine demonstration website](https://integration.widevine.com/player).
+3. Run:
 
-### Hardware dependencies
+   ```bash
+   ./dfd.sh --url=https://www.udio.com/songs/xxx
+   ```
 
-A standard x86-64 computer is sufficient to compile and run the artifact.
+- Replace the URL with a public `/songs/`, `/playlists/`, or `/creators/` link.
+- Use `--parallelism=4` to use multiple Firefox workers. Default is 4. Avoid high values.
+- Use `--output-path=/path/to/folder` to change the default `output/` folder.
+- The default format is `mp3`. Use `--format=m4a` to keep the original AAC stream data. You can also use `--format=wav` or `--format=flac`; these convert the streamed AAC. Other values are passed to ffmpeg as output formats.
 
-### Software dependencies
+Completed files are named `Artist - Song.<format>`. MP3 is encoded at 320 kbps. Available page metadata (artist, song name, lyrics) and cover art are embedded in MP3, M4A, WAV, and FLAC files.
 
-The attack can be performed on Linux (verified on Ubuntu 24.04.3) and Windows (verified on Windows 11 Enterprise 25H2), either on physical machines or virtual machines. For each platform, the required software dependencies are listed below:
+## Structure
 
-**On Linux.**
-  * [g++](https://gcc.gnu.org/), [cmake](https://cmake.org/) and [make](https://www.gnu.org/software/make/).
-  * libavutil-dev, libavcodec-dev, libavformat-dev, libswscale-dev from [FFmpeg](https://www.ffmpeg.org/).
-  * [Firefox](https://www.mozilla.org/firefox/) and [VLC](https://images.videolan.org/vlc/)
+The container builds the original processor and extension, installs Firefox and Python dependencies through a locked [uv script](https://docs.astral.sh/uv/guides/scripts/), and uses `linux/amd64` on macOS, Linux, and Windows. It runs natively on x86-64 hosts; ARM hosts need Docker's amd64 emulation.
 
-**On Windows.**
-  * [Visual Studio 2026](https://visualstudio.microsoft.com/) with the *Desktop development with C++* kit and MSVC v145.
-  * [Firefox](https://www.mozilla.org/firefox/).
+`output/index.md` lists every explored source and song link with its artist, title, and export status. `output/index.yml` lets later runs skip files still present in the selected format. Deleted files are exported again.
 
+Single songs go in `output/singles/`, while playlists and creator pages each get a folder named after the playlist or creator. Files appear in the mounted output folder as each export completes. The final CLI summary reports exported, already present, and failed song counts.
 
-## Set-up
+## Disclaimer
 
-### Installation
+This repository is intended for research and personal use only. It is provided as is, without warranties or guarantees.
 
-As described in the paper, we implemented two versions of the attack depending on the security level of the content keys. The content distributed on the Widevine demonstration website is protected with the lowest security level, allowing us to decrypt it directly without re-encoding. The second method, which involves re-encoding, can still be enforced by setting the preprocessor macro `REENCODE` in `Processor/hook/src/processor.cpp`. For faster execution, we set the AV1 encoder preset to 13 (on a scale from 1 to 13), but you can adjust this value in `Processor/hook/src/encoder.cpp`.
+Excessive or abusive use may cause Udio to restrict or ban your streaming access. Keep `--parallelism` low and be respectful of the platform!
 
-**On Linux.**
-  * Install all the required dependencies. On Ubuntu, they are all available in the default APT repositories, except for Firefox-ESR, which requires [configuring the Mozilla APT repository](https://support.mozilla.org/en-US/kb/install-firefox-linux\#w_install-firefox-deb-package-for-debian-based-distributions-recommended).
-  * Compile the attack executable by running `cmake . -B build \&\& make -C build/` in `Processor/`.
+## Attribution and license
 
-**On Windows.**
-  * Download and install [Visual Studio 2026](https://visualstudio.microsoft.com/downloads/). When asked which additional components to install, select *Desktop development with C++* with MSVC v145 and continue.
-  * Download and install the latest version of [Firefox](https://www.firefox.com/en-US/download/windows/).
-  * Double click on `Processor/DefectiveByDesign.sln` to open the solution in Visual Studio then build it with *Build > Build Solution*.
-
-## Evaluation workflow
-
-### Major Claim
-
-This artifact enables the reproduction described in our paper. When visiting a website that plays protected content using Widevine, an attacker can use the artifact to "download" a DRM-free version of the content, allowing for its redistribution and unlimited playback.
-
-### Experiment
-
-  * **(E1):** [Decrypt Attack] [A few seconds to minutes]: Run the attack to retrieve decrypted content.
-
-      * **Preparation:** Ensure that all instances of Firefox are closed.
-
-      * **Execution:**
-      
-          Open a terminal in `Processor/` and run:
-          ```sh
-          # On Linux
-          ./RUN.sh
-          # On Windows
-          ./RUN.ps1
-          ```
-          On both systems, once Firefox has opened, proceed as follows. In the first tab, click *Load Temporary Add-on...* and select any file from `Web-Extension/` to load the extension. In the second tab, start video playback using the blue play button on top of the player, then open the *Widevine Downloader* extension. The protected tracks should appear in the extension's pop-up. Select the ones you want to download and decrypt.
-
-      * **Results:** Once the track is downloaded, the video should stop playing, indicating that Widevine is busy decrypting the downloaded file. Depending on the track resolution and the encoder preset, the process may take a few minutes to complete. The resulting decrypted files are typically stored in `~/Downloads/WidevineMedia`.
-      
-      * **Troubleshooting:** Logs are written to `Processor/`. When attempting the attack multiple times, ensure that all instances of Firefox are fully closed (verify using the system's process list) before re-running the launch script.
-
-# Version
-
-Based on the LaTeX template for Artifact Evaluation V20231005. Submission, reviewing and badging methodology followed for the evaluation of this artifact can be found at [https://secartifacts.github.io/woot2026/](https://secartifacts.github.io/woot2026/).
+The Widevine processor and extension originate from [froud0t/DefectiveByDesign](https://github.com/froud0t/DefectiveByDesign). The [GPL-3.0 license](LICENSE.md) applies.

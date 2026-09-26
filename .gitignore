@@ -1,0 +1,14 @@
+output/
+.DS_Store
+Processor/build/
+.widevine-logs/
+*_decrypted.mp4
+audio_*.mp4
+video_*.mp4
+notification*.txt
+__pycache__/
+audio_*_decoded.ogg
+audio_*.m4a
+audio_*.mp3
+/*.m4a
+/*.mp3
